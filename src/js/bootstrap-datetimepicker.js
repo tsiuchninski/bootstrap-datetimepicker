@@ -716,7 +716,18 @@
 
                 for (i = 0; i < 42; i++) { //always display 42 days (should show 6 weeks)
                     if (currentDate.weekday() === 0) {
-                        row = $('<tr>');
+                        if(options.weekMode){
+
+                            if(currentDate.isSame(date, 'W')){
+                                row = $('<tr class="active-week">');
+                            }
+                            else{
+                                row = $('<tr class="hover-week">');
+                            }
+                        }
+                        else{
+                            row = $('<tr>');
+                        }
                         if (options.calendarWeeks) {
                             row.append('<td class="cw">' + currentDate.week() + '</td>');
                         }
@@ -730,6 +741,9 @@
                         clsNames.push('new');
                     }
                     if (currentDate.isSame(date, 'd') && !unset) {
+                        clsNames.push('active');
+                    }
+                    if(currentDate.isSame(date, 'W') && options.weekMode){
                         clsNames.push('active');
                     }
                     if (!isValid(currentDate, 'd')) {
@@ -1257,9 +1271,12 @@
                     input.focus();
                 }
 
+
                 notifyEvent({
                     type: 'dp.show'
                 });
+
+
                 return picker;
             },
 
@@ -1453,6 +1470,17 @@
         picker.show = show;
 
         picker.hide = hide;
+
+        picker.weekMode = function(weekMode){
+            if (arguments.length === 0) {
+                return options.weekMode;
+            }
+            if (typeof weekMode !== 'boolean') {
+                throw new TypeError('weekMode () expects a boolean parameter');
+            }
+            options.weekMode = weekMode;
+            return picker;
+        };
 
         picker.disable = function () {
             ///<summary>Disables the input element, the component is attached to, by adding a disabled="true" attribute to it.
@@ -2454,6 +2482,7 @@
         minDate: false,
         maxDate: false,
         useCurrent: true,
+        weekMode:false,
         collapse: true,
         locale: moment.locale(),
         defaultDate: false,
